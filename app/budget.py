@@ -19,34 +19,27 @@ def estimate_cost_usd(provider: LLMProvider, prompt: str, max_output_tokens: int
 def actual_cost_usd(provider: LLMProvider, prompt: str, output_tokens: int) -> float:
     """The same formula with the tokens actually produced."""
     return estimate_cost_usd(provider, prompt, output_tokens)
-
-
 class DailyBudget:
     """Per-tenant spend limit in USD. Budgets are per (tenant, today()) date; a new date
     starts from zero."""
-
     def __init__(self, limit_usd: float, today: Callable[[], date] = lambda: datetime.now(UTC).date()):
         self.limit_usd = limit_usd
         self.today = today
         # (tenant, date) -> money really spent, and the reservations still open
         self._spent: dict[tuple[str, date], float] = {}
         self._open: dict[tuple[str, date], list[float]] = {}
-
     def _key(self, tenant: str) -> tuple[str, date]:
         return (tenant, self.today())
-
     def remaining(self, tenant: str) -> float:
         """How much `tenant` can still spend today."""
         key = self._key(tenant)
         return self.limit_usd - self._spent.get(key, 0.0) - sum(self._open.get(key, []))
-
     def try_reserve(self, tenant: str, amount: float) -> bool:
         """Reserve `amount` for `tenant` and return True, only if amount <= remaining(tenant)."""
         if amount > self.remaining(tenant):
             return False
         self._open.setdefault(self._key(tenant), []).append(amount)
         return True
-
     def settle(self, tenant: str, reserved: float, actual: float) -> None:
         """Replace a reservation with the actual cost (actual may be 0, or more or less than
         reserved)."""
