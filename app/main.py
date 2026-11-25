@@ -24,11 +24,13 @@ class StreamSettings:
     max_output_tokens: int = 400
 
 
+### el body: el clause mn 1 l 8000 7arf, w el lo8a ar aw en bas (8er keda 422)
 class ExplainRequest(BaseModel):
     clause_text: str = Field(min_length=1, max_length=8000)
     language: Literal["ar", "en"]
 
 
+### error 5as bena lama el budget y5las abl ma el stream yebda2
 class BudgetExhausted(Exception):
     pass
 
@@ -50,6 +52,7 @@ def create_app(providers: Sequence[LLMProvider], budget: DailyBudget,
     providers = list(providers)
     app = FastAPI(title="Bayyina clause explainer")
 
+    ### n7awel el error le 429 problem+json
     @app.exception_handler(BudgetExhausted)
     async def _budget_exhausted(_: Request, __: BudgetExhausted):
         return JSONResponse({"type": "/problems/budget-exhausted",
@@ -62,6 +65,7 @@ def create_app(providers: Sequence[LLMProvider], budget: DailyBudget,
         """Runs after FastAPI has validated the body and header (422 otherwise) and before
         the stream starts, so it can still answer with a real 429."""
         prompt = build_prompt(body.clause_text, body.language)
+        ### arkhas provider: law 7atta da msh2der 3aleh, 429 abl ma nebda2
         cheapest = min((estimate_cost_usd(p, prompt, settings.max_output_tokens) for p in providers),
                        default=None)
         if cheapest is None or cheapest > budget.remaining(x_tenant_id):
@@ -76,8 +80,10 @@ def create_app(providers: Sequence[LLMProvider], budget: DailyBudget,
                                 ttft_timeout_s=settings.ttft_timeout_s,
                                 total_timeout_s=settings.total_timeout_s,
                                 max_output_tokens=settings.max_output_tokens)
-        async with aclosing(events):   # client gone -> the provider stream is closed too
+        ### law el client 2afal, aclosing bey2fel explain_stream w hwa bey2fel el provider
+        async with aclosing(events):
             async for ev in events:
+                ### kol event yetb3at ka SSE b esmo w el data JSON
                 yield ServerSentEvent(event=ev.kind, data=ev.data)
 
     return app
