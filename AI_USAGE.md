@@ -1,0 +1,24 @@
+# AI usage
+
+Keep all three headings exactly as they are. If this file is missing or any heading is
+missing, the grader stops and gives 0 ("AI_USAGE.md missing or incomplete"). The content
+is not scored, but your Track Mentor reads it and the W8 defence can ask about it.
+
+## Tools
+
+I used Claude for this task. It wrote the first version of app/budget.py, app/stream.py and
+app/main.py, and tests/test_mine.py with one or more tests for each hidden check in the README
+(H01-H14). I ran the public tests and those tests locally (29 passing) before pushing.
+
+## What AI got wrong
+
+<!-- At least one thing an assistant got wrong that you changed, and how you noticed
+(a test failed, the docs said otherwise, you ran it). -->
+
+## In my own words
+
+<!-- Answer without AI, one or two sentences each. -->
+
+1. Why is it safe to switch provider before the first token and not after?
+
+2. Which checks did you put before the stream starts, and why could they not be error events instead?
