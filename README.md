@@ -180,5 +180,3 @@ all of its own tests, so keep the names above exactly.
 
 Late policy: ×1.0 within 72 hours of the session starting, ×0.6 for the following 7 days,
 ×0.5 after that. Your best attempt counts.
-#   d s c 2 6 - s w e - w 0 6  
- 
